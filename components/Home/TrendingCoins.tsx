@@ -4,13 +4,18 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { TrendingCoinsFallback } from "./FallBack";
 
 const TrendingCoins = async () => {
-  const trendingCoins = await fetcher<{ coins: TrendingCoin[] }>(
-    "/search/trending",
-    undefined,
-    300,
-  );
+  let trendingCoins: { coins: TrendingCoin[] };
+
+  try {
+    trendingCoins = await fetcher<{ coins: TrendingCoin[] }>("/search/trending", undefined, 300);
+  } catch (error) {
+    console.error("Error fetching trending coins:", error);
+    return <TrendingCoinsFallback />;
+  }
+
   const columns: DataTableColumn<TrendingCoin>[] = [
     {
       header: "Name",
@@ -26,14 +31,14 @@ const TrendingCoins = async () => {
       },
     },
     {
-      header: '24h Change',
-      cellClassName: 'change-cell',
+      header: "24h Change",
+      cellClassName: "change-cell",
       cell: (coin) => {
         const item = coin.item;
         const isTrendingUp = item.data.price_change_percentage_24h.usd > 0;
 
         return (
-          <div className={cn('price-change', isTrendingUp ? 'text-green-500' : 'text-red-500')}>
+          <div className={cn("price-change", isTrendingUp ? "text-green-500" : "text-red-500")}>
             <p>
               {isTrendingUp ? (
                 <TrendingUp width={16} height={16} />
@@ -47,8 +52,8 @@ const TrendingCoins = async () => {
       },
     },
     {
-      header: 'Price',
-      cellClassName: 'price-cell',
+      header: "Price",
+      cellClassName: "price-cell",
       cell: (coin) => formatCurrency(coin.item.data.price),
     },
   ];
