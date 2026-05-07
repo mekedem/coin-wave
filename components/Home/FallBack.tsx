@@ -1,5 +1,5 @@
-import React from 'react';
-import DataTable from '@/components/DataTable';
+import React from "react";
+import DataTable from "@/components/DataTable";
 
 export const CoinOverviewFallback = () => {
   return (
@@ -19,9 +19,11 @@ export const CoinOverviewFallback = () => {
 };
 
 export const TrendingCoinsFallback = () => {
-  const columns = [
+  type FallbackRow = { id: number };
+
+  const columns: DataTableColumn<FallbackRow>[] = [
     {
-      header: 'Name',
+      header: "Name",
       cell: () => (
         <div className="name-link">
           <div className="name-image skeleton" />
@@ -30,7 +32,7 @@ export const TrendingCoinsFallback = () => {
       ),
     },
     {
-      header: '24h Change',
+      header: "24h Change",
       cell: () => (
         <div className="price-change">
           <div className="change-icon skeleton" />
@@ -39,20 +41,20 @@ export const TrendingCoinsFallback = () => {
       ),
     },
     {
-      header: 'Price',
+      header: "Price",
       cell: () => <div className="price-line skeleton" />,
     },
   ];
 
-  const dummyData = Array.from({ length: 6 }, (_, i) => ({ id: i }));
+  const dummyData: FallbackRow[] = Array.from({ length: 6 }, (_, i) => ({ id: i }));
 
   return (
     <div id="trending-coins-fallback">
       <h4>Trending Coins</h4>
       <DataTable
         data={dummyData}
-        columns={columns as any}
-        rowKey={(item: any) => item.id}
+        columns={columns}
+        rowKey={(item) => item.id}
         tableClassName="trending-coins-table"
       />
     </div>
