@@ -1,31 +1,31 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from 'react';
 import {
   getCandlestickConfig,
   getChartConfig,
   LIVE_INTERVAL_BUTTONS,
   PERIOD_BUTTONS,
   PERIOD_CONFIG,
-} from "@/constants";
-import { CandlestickSeries, createChart, IChartApi, ISeriesApi } from "lightweight-charts";
-import { fetcher } from "@/lib/coingecko.actions";
-import { convertOHLCData } from "@/lib/utils";
+} from '@/constants';
+import { CandlestickSeries, createChart, IChartApi, ISeriesApi } from 'lightweight-charts';
+import { fetcher } from '@/lib/coingecko.actions';
+import { convertOHLCData } from '@/lib/utils';
 
 const CandleStick = ({
   children,
   data,
   coinId,
   height = 360,
-  initialPeriod = "daily",
+  initialPeriod = 'daily',
   liveOhlcv = null,
-  mode = "historical",
+  mode = 'historical',
   liveInterval,
   setLiveInterval,
 }: CandlestickChartProps) => {
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
-  const candleSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const prevOhlcDataLength = useRef<number>(data?.length || 0);
 
   const [period, setPeriod] = useState(initialPeriod);
@@ -34,19 +34,20 @@ const CandleStick = ({
 
   const fetchOHLCData = async (selectedPeriod: Period) => {
     try {
-      const { days } = PERIOD_CONFIG[selectedPeriod];
+      const { days, interval } = PERIOD_CONFIG[selectedPeriod];
 
       const newData = await fetcher<OHLCData[]>(`/coins/${coinId}/ohlc`, {
-        vs_currency: "usd",
+        vs_currency: 'usd',
         days,
-        precision: "full",
+        interval,
+        precision: 'full',
       });
 
       startTransition(() => {
         setOhlcData(newData ?? []);
       });
     } catch (e) {
-      console.error("Failed to fetch OHLCData", e);
+      console.error('Failed to fetch OHLCData', e);
     }
   };
 
@@ -61,7 +62,7 @@ const CandleStick = ({
     const container = chartContainerRef.current;
     if (!container) return;
 
-    const showTime = ["daily", "weekly", "monthly"].includes(period);
+    const showTime = ['daily', 'weekly', 'monthly'].includes(period);
 
     const chart = createChart(container, {
       ...getChartConfig(height, showTime),
@@ -69,7 +70,10 @@ const CandleStick = ({
     });
     const series = chart.addSeries(CandlestickSeries, getCandlestickConfig());
 
-    const convertedToSeconds = ohlcData.map((item)=>[Math.floor(item[0] / 1000), item[1], item[2], item[3], item[4]] as OHLCData);
+    const convertedToSeconds = ohlcData.map(
+      (item) => [Math.floor(item[0] / 1000), item[1], item[2], item[3], item[4]] as OHLCData,
+    );
+
     series.setData(convertOHLCData(convertedToSeconds));
     chart.timeScale().fitContent();
 
@@ -120,7 +124,7 @@ const CandleStick = ({
 
     const dataChanged = prevOhlcDataLength.current !== ohlcData.length;
 
-    if (dataChanged || mode === "historical") {
+    if (dataChanged || mode === 'historical') {
       chartRef.current?.timeScale().fitContent();
       prevOhlcDataLength.current = ohlcData.length;
     }
@@ -136,7 +140,7 @@ const CandleStick = ({
           {PERIOD_BUTTONS.map(({ value, label }) => (
             <button
               key={value}
-              className={period === value ? "config-button-active" : "config-button"}
+              className={period === value ? 'config-button-active' : 'config-button'}
               onClick={() => handlePeriodChange(value)}
               disabled={isPending}
             >
@@ -151,7 +155,7 @@ const CandleStick = ({
             {LIVE_INTERVAL_BUTTONS.map(({ value, label }) => (
               <button
                 key={value}
-                className={liveInterval === value ? "config-button-active" : "config-button"}
+                className={liveInterval === value ? 'config-button-active' : 'config-button'}
                 onClick={() => setLiveInterval && setLiveInterval(value)}
                 disabled={isPending}
               >
